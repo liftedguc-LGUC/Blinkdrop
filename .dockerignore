@@ -1,0 +1,16 @@
+.git/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+scripts/
+01-pm/
+02-uiux-developer/
+03-swe/
+wireframe.html
+design-spec.md
+CLAUDE.md
+requirements-dev.txt
+pytest.ini
+*.png

@@ -14,11 +14,12 @@
 
     <div class="field">
       <label class="field-label" for="input-job-ref">Delivery</label>
-      <input type="text" id="input-job-ref" class="input input-readonly"
+      <input type="text" id="input-job-ref" name="job_ref" form="form-feedback"
+             class="input input-readonly"
              value="Job #4821 — Alex M." readonly aria-readonly="true">
     </div>
 
-    <form id="form-feedback" action="thanks.html" method="get">
+    <form id="form-feedback" action="/api/feedback" method="post">
       <div class="field">
         <span class="field-label" id="label-rating">How was this delivery?</span>
         <fieldset class="star-rating" aria-labelledby="label-rating">
@@ -58,10 +59,14 @@
         </span>
       </div>
 
+      <p id="form-error" class="empty-state" role="alert" hidden
+         style="margin-top: var(--space-4);">Couldn't submit &mdash; please try again.</p>
+
       <button type="submit" id="btn-submit-feedback" class="btn btn-primary btn-block" style="margin-top: var(--space-5);">Submit</button>
     </form>
   </div>
 </main>
 
+<script src="app.js" defer></script>
 </body>
 </html>

@@ -52,18 +52,19 @@
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-by-driver">
       <h2 class="panel-title">Exceptions by driver (Today)</h2>
-      <p class="empty-state">No exceptions filed today.</p>
+      <p class="empty-state" id="empty-by-driver">No exceptions filed today.</p>
+      <ul class="driver-list" id="list-by-driver" hidden></ul>
     </div>
 
     <div class="pill-tabs" role="tablist" aria-label="Filter exceptions">
-      <button type="button" id="filter-tab-all" class="pill-tab is-active" role="tab" aria-selected="true">All</button>
-      <button type="button" id="filter-tab-pending" class="pill-tab" role="tab" aria-selected="false">Pending</button>
-      <button type="button" id="filter-tab-needs-review" class="pill-tab" role="tab" aria-selected="false">Needs review</button>
-      <button type="button" id="filter-tab-approved" class="pill-tab" role="tab" aria-selected="false">Approved</button>
-      <button type="button" id="filter-tab-waived" class="pill-tab" role="tab" aria-selected="false">Waived</button>
-      <button type="button" id="filter-tab-exported" class="pill-tab" role="tab" aria-selected="false">Exported</button>
+      <button type="button" id="filter-tab-all" class="pill-tab is-active" role="tab" aria-selected="true" data-status="all">All</button>
+      <button type="button" id="filter-tab-pending" class="pill-tab" role="tab" aria-selected="false" data-status="pending">Pending</button>
+      <button type="button" id="filter-tab-needs-review" class="pill-tab" role="tab" aria-selected="false" data-status="needs-review">Needs review</button>
+      <button type="button" id="filter-tab-approved" class="pill-tab" role="tab" aria-selected="false" data-status="approved">Approved</button>
+      <button type="button" id="filter-tab-waived" class="pill-tab" role="tab" aria-selected="false" data-status="waived">Waived</button>
+      <button type="button" id="filter-tab-exported" class="pill-tab" role="tab" aria-selected="false" data-status="exported">Exported</button>
     </div>
 
     <div class="table-wrap">
@@ -80,7 +81,7 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tbody-exceptions">
           <tr class="table-empty-row">
             <td colspan="8">No exceptions match this filter.</td>
           </tr>
@@ -90,5 +91,6 @@
   </main>
 </div>
 
+<script src="app.js" defer></script>
 </body>
 </html>
