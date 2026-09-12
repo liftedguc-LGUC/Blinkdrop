@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "gcp-docs": {
+      "command": "<FILL IN: the executable that launches your gcp-docs MCP server>",
+      "args": ["<FILL IN: its arguments>"],
+      "env": {}
+    }
+  }
+}

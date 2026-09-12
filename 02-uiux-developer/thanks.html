@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blinkdrop — Thank You</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="centered-page">
+  <div class="card" style="text-align: center;">
+    <svg class="icon-check" width="48" height="48" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true" style="margin: 0 auto;">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M8 12l3 3 5-6"></path>
+    </svg>
+
+    <h1 id="heading-thanks" style="font-size: var(--fs-3xl);">Thanks for your feedback!</h1>
+
+    <p style="color: var(--color-text-secondary);">
+      Your response helps us improve every delivery.
+    </p>
+
+    <a href="landing.html" class="btn btn-primary btn-block" id="btn-done">Done</a>
+
+    <!--
+      Wireframe marks this link "admin only." No auth layer exists in this
+      static build, so it renders unconditionally; real admin-gating is a
+      backend/JS concern out of scope for this stage.
+    -->
+    <a href="dashboard.html" class="btn-ghost" id="link-manage-deliveries">Manage my deliveries</a>
+  </div>
+</main>
+
+</body>
+</html>

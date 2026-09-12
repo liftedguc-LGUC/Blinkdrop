@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blinkdrop — Delivery Feedback</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="centered-page">
+  <div class="card">
+    <a href="landing.html" class="btn-ghost" id="link-back-to-landing">&larr; back</a>
+
+    <div class="field">
+      <label class="field-label" for="input-job-ref">Delivery</label>
+      <input type="text" id="input-job-ref" class="input input-readonly"
+             value="Job #4821 — Alex M." readonly aria-readonly="true">
+    </div>
+
+    <form id="form-feedback" action="thanks.html" method="get">
+      <div class="field">
+        <span class="field-label" id="label-rating">How was this delivery?</span>
+        <fieldset class="star-rating" aria-labelledby="label-rating">
+          <legend class="visually-hidden">Rate your delivery, 1 to 5 stars</legend>
+
+          <input type="radio" id="input-rating-5" name="rating" value="5">
+          <label for="input-rating-5">&#9733;<span class="visually-hidden">5 stars</span></label>
+
+          <input type="radio" id="input-rating-4" name="rating" value="4">
+          <label for="input-rating-4">&#9733;<span class="visually-hidden">4 stars</span></label>
+
+          <input type="radio" id="input-rating-3" name="rating" value="3">
+          <label for="input-rating-3">&#9733;<span class="visually-hidden">3 stars</span></label>
+
+          <input type="radio" id="input-rating-2" name="rating" value="2">
+          <label for="input-rating-2">&#9733;<span class="visually-hidden">2 stars</span></label>
+
+          <input type="radio" id="input-rating-1" name="rating" value="1">
+          <label for="input-rating-1">&#9733;<span class="visually-hidden">1 star</span></label>
+        </fieldset>
+      </div>
+
+      <div class="field" style="margin-top: var(--space-4);">
+        <label class="field-label" for="input-comment">Comments</label>
+        <textarea id="input-comment" name="comment" class="textarea"
+                  placeholder="Tell us more about your delivery..."></textarea>
+      </div>
+
+      <div class="checkbox-group" style="margin-top: var(--space-4);">
+        <span class="checkbox-item">
+          <input type="checkbox" id="input-late" name="late">
+          <label for="input-late">Late</label>
+        </span>
+        <span class="checkbox-item">
+          <input type="checkbox" id="input-damaged" name="damaged">
+          <label for="input-damaged">Damaged</label>
+        </span>
+      </div>
+
+      <button type="submit" id="btn-submit-feedback" class="btn btn-primary btn-block" style="margin-top: var(--space-5);">Submit</button>
+    </form>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blinkdrop — Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="logo" id="logo-dashboard">
+      <span class="logo-mark" aria-hidden="true">B</span>
+      <span class="logo-wordmark">Blinkdrop</span>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="dashboard.html" id="nav-dashboard" class="nav-item is-active" aria-current="page">Dashboard</a></li>
+      <li><a href="#" id="nav-stops" class="nav-item">Stops</a></li>
+      <li><a href="#" id="nav-drivers" class="nav-item">Drivers</a></li>
+      <li><a href="#" id="nav-exceptions" class="nav-item">Exceptions</a></li>
+      <li><a href="#" id="nav-rate-cards" class="nav-item">Rate cards</a></li>
+      <li><a href="#" id="nav-exports" class="nav-item">Exports</a></li>
+      <li><a href="#" id="nav-settings" class="nav-item">Settings</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-main">
+    <h1 id="heading-dashboard" style="font-size: var(--fs-3xl);">Dashboard</h1>
+
+    <div class="stat-grid">
+      <div class="stat-card" id="stat-exceptions-today">
+        <span class="stat-card-label">Exceptions today</span>
+        <span class="stat-card-value">0</span>
+        <span class="stat-card-caption">filed so far</span>
+      </div>
+      <div class="stat-card" id="stat-pending-review">
+        <span class="stat-card-label">Pending review</span>
+        <span class="stat-card-value">0</span>
+        <span class="stat-card-caption">awaiting action</span>
+      </div>
+      <div class="stat-card" id="stat-approved-today">
+        <span class="stat-card-label">Approved today</span>
+        <span class="stat-card-value stat-card-value--success">$0.00</span>
+        <span class="stat-card-caption">0 charges</span>
+      </div>
+      <div class="stat-card" id="stat-top-driver">
+        <span class="stat-card-label">Top driver</span>
+        <span class="stat-card-value">&mdash;</span>
+        <span class="stat-card-caption">no data yet</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">Exceptions by driver (Today)</h2>
+      <p class="empty-state">No exceptions filed today.</p>
+    </div>
+
+    <div class="pill-tabs" role="tablist" aria-label="Filter exceptions">
+      <button type="button" id="filter-tab-all" class="pill-tab is-active" role="tab" aria-selected="true">All</button>
+      <button type="button" id="filter-tab-pending" class="pill-tab" role="tab" aria-selected="false">Pending</button>
+      <button type="button" id="filter-tab-needs-review" class="pill-tab" role="tab" aria-selected="false">Needs review</button>
+      <button type="button" id="filter-tab-approved" class="pill-tab" role="tab" aria-selected="false">Approved</button>
+      <button type="button" id="filter-tab-waived" class="pill-tab" role="tab" aria-selected="false">Waived</button>
+      <button type="button" id="filter-tab-exported" class="pill-tab" role="tab" aria-selected="false">Exported</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table" id="table-exceptions">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="input-select-all" aria-label="Select all"></th>
+            <th>Driver</th>
+            <th>Customer</th>
+            <th>Job ref</th>
+            <th>Type</th>
+            <th>Time</th>
+            <th>Charge</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table-empty-row">
+            <td colspan="8">No exceptions match this filter.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
