@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blinkdrop Feedback App — Wireframe</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Courier New", monospace;
+    background: #f2f2f2;
+    color: #222;
+    margin: 0;
+    padding: 24px;
+  }
+  h1 {
+    font-size: 18px;
+    margin: 0 0 4px;
+  }
+  p.subtitle {
+    margin: 0 0 24px;
+    color: #666;
+    font-size: 13px;
+  }
+  .board {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 24px;
+  }
+  .screen-wrap {
+    display: flex;
+    align-items: center;
+  }
+  .screen {
+    width: 300px;
+    min-width: 300px;
+    border: 2px solid #333;
+    background: #fff;
+    padding: 12px;
+  }
+  .screen-label {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #333;
+    color: #fff;
+    padding: 6px 0;
+    margin: -12px -12px 12px -12px;
+  }
+  .box {
+    border: 1px dashed #999;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #444;
+  }
+  .box.tall { min-height: 60px; }
+  .box.short { min-height: 20px; }
+  .box.center { text-align: center; }
+  .btn {
+    border: 2px solid #333;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .row .box, .row .stat {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  .stat {
+    border: 1px solid #999;
+    padding: 6px;
+    font-size: 10px;
+    text-align: center;
+  }
+  .stat .num { font-size: 14px; font-weight: bold; }
+  .sidebar-item {
+    border-bottom: 1px solid #ddd;
+    padding: 4px 2px;
+    font-size: 11px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .tab {
+    border: 1px solid #999;
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  table.wire {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+  table.wire th, table.wire td {
+    border: 1px solid #ccc;
+    padding: 3px;
+    text-align: left;
+  }
+  .dashboard-layout {
+    display: flex;
+    gap: 8px;
+  }
+  .dash-sidebar {
+    width: 70px;
+    min-width: 70px;
+    border: 1px solid #999;
+    padding: 6px;
+  }
+  .dash-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .arrow-block {
+    width: 140px;
+    min-width: 140px;
+    text-align: center;
+    padding: 0 8px;
+    font-size: 11px;
+    color: #444;
+  }
+  .arrow {
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .action-label {
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h1>Blinkdrop Feedback App — Clickable Wireframe (v1)</h1>
+<p class="subtitle">Low-fidelity boxes only, no real styling. Arrows show the user action that moves to the next screen.</p>
+
+<div class="board">
+
+  <!-- SCREEN 1: LANDING -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-label">1. Landing</div>
+      <div class="box short center">[ Blinkdrop logo ]</div>
+      <div class="box tall center">
+        Heading:<br>"How was your delivery today?"
+      </div>
+      <div class="box short center">Subtext: short blurb asking for feedback</div>
+      <div class="btn center">[ GIVE FEEDBACK ]</div>
+      <div class="box short center">link: "No thanks, skip"</div>
+    </div>
+    <div class="arrow-block">
+      <div class="arrow">&#8594;</div>
+      <div class="action-label">Tap "Give Feedback"</div>
+      <div>goes to Form</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: FORM -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-label">2. Form</div>
+      <div class="box short center">&larr; back</div>
+      <div class="box short">Job ref / driver (prefilled)</div>
+      <div class="box short center">[ ★ ★ ★ ★ ★ ] rating input</div>
+      <div class="box tall">Comment box (placeholder text)</div>
+      <div class="row">
+        <div class="box short center">[ ] Late</div>
+        <div class="box short center">[ ] Damaged</div>
+      </div>
+      <div class="btn center">[ SUBMIT ]</div>
+    </div>
+    <div class="arrow-block">
+      <div class="arrow">&#8594;</div>
+      <div class="action-label">Tap "Submit"</div>
+      <div>goes to Thanks</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: THANKS -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-label">3. Thanks</div>
+      <div class="box short center">[ checkmark icon ]</div>
+      <div class="box tall center">
+        Heading:<br>"Thanks for your feedback!"
+      </div>
+      <div class="box short center">Subtext: "Your response helps us improve"</div>
+      <div class="btn center">[ DONE ]</div>
+      <div class="box short center">link: "Manage my deliveries" (admin only)</div>
+    </div>
+    <div class="arrow-block">
+      <div class="arrow">&#8594;</div>
+      <div class="action-label">Admin taps link<br>(or logs in)</div>
+      <div>goes to Dashboard</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: DASHBOARD -->
+  <div class="screen-wrap">
+    <div class="screen" style="width:380px; min-width:380px;">
+      <div class="screen-label">4. Dashboard</div>
+      <div class="dashboard-layout">
+        <div class="dash-sidebar">
+          <div class="box short center" style="margin-bottom:6px;">[ logo ]</div>
+          <div class="sidebar-item">Dashboard</div>
+          <div class="sidebar-item">Stops</div>
+          <div class="sidebar-item">Drivers</div>
+          <div class="sidebar-item">Exceptions</div>
+          <div class="sidebar-item">Rate cards</div>
+          <div class="sidebar-item">Exports</div>
+          <div class="sidebar-item">Settings</div>
+        </div>
+        <div class="dash-main">
+          <div class="row" style="margin-bottom:8px;">
+            <div class="stat"><div class="num">0</div>Exceptions today</div>
+            <div class="stat"><div class="num">0</div>Pending review</div>
+            <div class="stat"><div class="num">$0</div>Approved today</div>
+            <div class="stat"><div class="num">—</div>Top driver</div>
+          </div>
+          <div class="box short" style="margin-bottom:8px;">Exceptions by driver (chart/list placeholder)</div>
+          <div class="tabs">
+            <div class="tab">All</div>
+            <div class="tab">Pending</div>
+            <div class="tab">Approved</div>
+          </div>
+          <table class="wire">
+            <tr><th>Driver</th><th>Customer</th><th>Type</th><th>Status</th></tr>
+            <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
