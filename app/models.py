@@ -22,6 +22,20 @@ def normalize_status(raw: str) -> str:
     return raw.strip().lower().replace("-", "_")
 
 
+# A charge moves forward through review, never sideways or backwards. Without
+# this an authenticated slip (or, before auth existed, anyone at all) could flip
+# a settled record back to pending and lose its approval timestamp.
+ALLOWED_TRANSITIONS: dict[ExceptionStatus, frozenset[ExceptionStatus]] = {
+    ExceptionStatus.PENDING: frozenset(
+        {ExceptionStatus.NEEDS_REVIEW, ExceptionStatus.APPROVED, ExceptionStatus.WAIVED}
+    ),
+    ExceptionStatus.NEEDS_REVIEW: frozenset({ExceptionStatus.APPROVED, ExceptionStatus.WAIVED}),
+    ExceptionStatus.APPROVED: frozenset({ExceptionStatus.EXPORTED}),
+    ExceptionStatus.WAIVED: frozenset(),
+    ExceptionStatus.EXPORTED: frozenset(),
+}
+
+
 class FeedbackIn(BaseModel):
     job_ref: str = Field(min_length=1, max_length=120)
     rating: int | None = Field(default=None, ge=1, le=5)
@@ -65,7 +79,19 @@ class ExceptionRecord(BaseModel):
     created_at: datetime
     updated_at: datetime
     approved_at: datetime | None = None
+    updated_by: str = ""
     seeded: bool = False
+
+
+class ExceptionEvent(BaseModel):
+    """Append-only record of a status change. Answers "who waived this charge"."""
+
+    id: str = ""
+    exception_id: str
+    from_status: ExceptionStatus
+    to_status: ExceptionStatus
+    actor: str
+    at: datetime
 
 
 class FeedbackOut(BaseModel):

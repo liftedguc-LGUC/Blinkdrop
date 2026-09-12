@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .config import get_settings
+from .middleware import BodySizeLimitMiddleware, SecurityHeadersMiddleware
 from .repository import InMemoryRepository, Repository
 from .routes_api import router as api_router
 from .seed import JOBS, seed_records
@@ -28,9 +29,20 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Blinkdrop", lifespan=lifespan)
-    # API first: the static catch-all is single-segment, so it can never shadow
-    # /api/..., but registration order keeps that guarantee obvious.
+    settings = get_settings()
+    # The schema documented every route including the seeding one, handing a
+    # scanner a map of the mutation API. Off unless explicitly enabled.
+    docs = {"docs_url": "/docs", "redoc_url": "/redoc", "openapi_url": "/openapi.json"}
+    if not settings.expose_docs:
+        docs = {"docs_url": None, "redoc_url": None, "openapi_url": None}
+
+    app = FastAPI(title="Blinkdrop", lifespan=lifespan, **docs)
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_body_bytes)
+
+    # API first. The static catch-all is single-segment so it cannot shadow
+    # /api/..., but /healthz is single-segment and genuinely does depend on
+    # this order.
     app.include_router(api_router)
     app.include_router(static_router)
     return app

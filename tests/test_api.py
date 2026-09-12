@@ -31,8 +31,10 @@ def make_exception(**overrides) -> ExceptionRecord:
     return ExceptionRecord(**{**defaults, **overrides})
 
 
-def test_healthz_reports_the_resolved_backend(client):
-    assert client.get("/healthz").json() == {"status": "ok", "backend": "memory"}
+def test_healthz_is_a_bare_liveness_signal(client):
+    # It used to report the storage backend, which doubled as a hint about
+    # whether the dev endpoints were enabled.
+    assert client.get("/healthz").json() == {"status": "ok"}
 
 
 def test_json_submission_creates_an_exception(client):

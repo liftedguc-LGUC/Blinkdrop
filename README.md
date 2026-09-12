@@ -31,14 +31,17 @@ prove the form still works without it.
 
 ## API
 
+Everything marked **admin** requires authentication (see Security below).
+
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/healthz` | reports the resolved storage backend |
-| POST | `/api/feedback` | JSON → `201`; form-encoded → `303` to `/thanks.html` |
-| GET | `/api/exceptions?status=&limit=` | `all`, `pending`, `needs-review`, `approved`, `waived`, `exported` |
-| GET | `/api/stats` | the four dashboard tiles + per-driver counts |
-| PATCH | `/api/exceptions/{id}` | move an exception's status |
-| POST | `/api/dev/seed?force=` | demo data; disabled unless `ALLOW_DEV_ENDPOINTS` |
+| GET | `/healthz` | liveness only |
+| POST | `/api/feedback` | public. JSON → `201`; form-encoded → `303` to `/thanks.html`. Rate-limited; `job_ref` must name a known job |
+| GET | `/api/exceptions?status=&limit=` | **admin.** `all`, `pending`, `needs-review`, `approved`, `waived`, `exported` |
+| GET | `/api/stats` | **admin.** the four dashboard tiles + per-driver counts |
+| PATCH | `/api/exceptions/{id}` | **admin.** move a status; only forward transitions, audited |
+| GET | `/api/exceptions/{id}/events` | **admin.** who changed this record, and when |
+| POST | `/api/dev/seed` | **admin.** additive demo data; off unless `ALLOW_DEV_ENDPOINTS`. To seed a real database use `scripts/seed_firestore.py` |
 
 ## Business rules
 
@@ -53,7 +56,9 @@ so it is cheap to change:
 - Rate card: late `$5.00`, damaged `$12.00`, rating-only `$0.00`, and the two
   flags **sum** to `$17.00`.
 - Everything starts `pending`. The lifecycle `pending → needs_review →
-  approved | waived → exported` is moved by a human via `PATCH`.
+  approved | waived → exported` is moved by an authenticated human via `PATCH`,
+  and only forwards — a settled charge cannot be reopened, and every move is
+  recorded with who made it.
 - "Pending review" counts open items all-time; "Approved today" sums charges
   approved today; "Top driver" is the most exceptions today, alphabetical
   tie-break.
@@ -72,29 +77,72 @@ so it is cheap to change:
 | `SEED_ON_STARTUP` | true on memory | never defaults true against Firestore |
 | `ALLOW_DEV_ENDPOINTS` | true on memory | gates `/api/dev/seed` |
 | `APP_TIMEZONE_OFFSET_HOURS` | `0` | day boundary for the "today" tiles |
+| `ADMIN_AUTH` | derived | `iap`, `basic`, or `off` — see Security |
+| `ADMIN_USER` / `ADMIN_PASSWORD` | `admin` / — | credentials for `basic` |
+| `IAP_AUDIENCE` | — | required for `iap`; selects `iap` when set |
+| `IAP_ALLOWED_EMAILS` | — | optional comma-separated allowlist |
+| `REQUIRE_KNOWN_JOB` | true | reject feedback naming an unknown job |
+| `EXPOSE_DOCS` | true on memory | `/docs` and `/openapi.json` |
+| `MAX_BODY_BYTES` | `65536` | request bodies above this are rejected |
+| `FEEDBACK_RATE_LIMIT_PER_MINUTE` | `20` | per instance, per client address |
 
 Backend selection: explicit `STORAGE_BACKEND` wins, else `FIRESTORE_EMULATOR_HOST`,
 else Cloud Run/`GOOGLE_CLOUD_PROJECT`, else memory.
 
+## Security
+
+The feedback form is public by necessity. **Everything else is not**: the
+dashboard, the exception and stats APIs, and the status-change endpoint all
+require authentication.
+
+`ADMIN_AUTH` picks how:
+
+- **`iap`** — validates the JWT Cloud IAP sets in `X-Goog-IAP-JWT-Assertion`.
+  The production target: identity is Google's and the app stores no password.
+  Needs an external HTTPS load balancer with IAP in front of the service.
+- **`basic`** — HTTP Basic against `ADMIN_PASSWORD`, which should come from
+  Secret Manager. The stopgap when there is no load balancer.
+- **`off`** — no check. Local development only.
+
+If neither is configured and the backend is Firestore, the admin routes return
+**503 rather than serving** — a deploy that forgets credentials fails closed
+instead of exposing customer data.
+
+Status changes only move forward (`pending → needs_review → approved | waived →
+exported`), every change records who made it, and `GET /api/exceptions/{id}/events`
+returns that history.
+
+A full assessment, including what was found and what is still outstanding, is in
+[`04-security-engineer/REVIEW.md`](04-security-engineer/REVIEW.md).
+
 ## Deploy to Cloud Run
 
+Use `./deploy.sh`, which does all of the below idempotently:
+
 ```bash
-gcloud services enable run.googleapis.com firestore.googleapis.com \
-  cloudbuild.googleapis.com artifactregistry.googleapis.com
-
-gcloud firestore databases create --location=<REGION>   # Native mode, once
-
-gcloud run deploy blinkdrop --source . --region <REGION> --allow-unauthenticated \
-  --set-env-vars STORAGE_BACKEND=firestore,GOOGLE_CLOUD_PROJECT=<PROJECT>
-
-gcloud projects add-iam-policy-binding <PROJECT> \
-  --member serviceAccount:<RUNTIME_SA> --role roles/datastore.user
+PROJECT=my-project REGION=europe-west1 ./deploy.sh
 ```
+
+It creates a **dedicated runtime service account** with a custom role granting
+only Firestore create/get/list/update — deliberately **not** delete — and wires
+`ADMIN_PASSWORD` from Secret Manager. Do not deploy without `--service-account`:
+the Compute Engine default identity holds `roles/editor` on the whole project,
+which would make any future compromise of this service a project-wide one.
 
 `--source .` builds through Cloud Build, so local Docker isn't needed.
 
-To seed the real database once, deploy with `ALLOW_DEV_ENDPOINTS=true`, run
-`curl -X POST "$URL/api/dev/seed"`, then redeploy without it.
+To seed a real database, run it locally against your own credentials — there is
+no endpoint that can delete or overwrite production data:
+
+```bash
+gcloud auth application-default login
+GOOGLE_CLOUD_PROJECT=<project> python scripts/seed_firestore.py
+```
+
+CI deploys are in `.github/workflows/deploy.yml`, using Workload Identity
+Federation (no service account keys). It stays inert until you create the WIF
+pool and set the `GCP_PROJECT`, `GCP_REGION`, `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`
+and `GCP_RUNTIME_SA` repository variables.
 
 ### Known gaps
 
@@ -103,8 +151,11 @@ To seed the real database once, deploy with `ALLOW_DEV_ENDPOINTS=true`, run
   first place it gets exercised.
 - **The Firestore path is untested.** No emulator was available (no `gcloud` in
   the sandbox), so `app/firestore_repo.py` is verified only by inspection and by
-  sharing its stats math with the in-memory backend. Test it against a real
+  sharing its stats math with the in-memory backend. Smoke-test it against a real
   database before trusting it.
-- **There is no authentication.** `--allow-unauthenticated` is required for the
-  public feedback form, which means the dashboard at `/dashboard.html` and every
-  `/api/*` route are public too. Add an auth layer before real data goes in.
+- **The in-app rate limit is per instance.** Cloud Run autoscales, so a
+  distributed flood gets a multiple of it. Put Cloud Armor in front of
+  `POST /api/feedback` before carrying real traffic.
+- **Feedback submissions are not bound to a delivery.** A known `job_ref` can be
+  submitted against repeatedly. Per-delivery single-use tokens are the fix; see
+  D1 in the review.

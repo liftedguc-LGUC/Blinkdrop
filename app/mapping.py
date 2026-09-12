@@ -10,6 +10,7 @@ from .config import DAMAGED_CHARGE_CENTS, LATE_CHARGE_CENTS, POOR_RATING_MAX
 from .models import ExceptionRecord, ExceptionStatus, ExceptionType, FeedbackIn, Job
 
 UNKNOWN_CUSTOMER = "Unknown customer"
+UNASSIGNED_DRIVER = "Unassigned"
 
 
 def _type_label(flags: list[str]) -> str:
@@ -22,7 +23,9 @@ def _type_label(flags: list[str]) -> str:
     return "Service"
 
 
-def to_exception(fb: FeedbackIn, job: Job | None, now: datetime | None = None) -> ExceptionRecord | None:
+def to_exception(
+    fb: FeedbackIn, job: Job | None, now: datetime | None = None
+) -> ExceptionRecord | None:
     """Return the exception this feedback warrants, or None for a clean delivery."""
     flags = [name for name, on in (("late", fb.late), ("damaged", fb.damaged)) if on]
     poor_rating = fb.rating is not None and fb.rating <= POOR_RATING_MAX
@@ -41,7 +44,10 @@ def to_exception(fb: FeedbackIn, job: Job | None, now: datetime | None = None) -
 
     return ExceptionRecord(
         job_ref=fb.job_ref,
-        driver=job.driver if job else parse_driver(fb.job_ref),
+        # Attribution comes only from a known job. It used to be parsed out of
+        # the client-supplied job_ref, which let anyone file charges against any
+        # named driver for deliveries that never happened.
+        driver=job.driver if job else UNASSIGNED_DRIVER,
         customer=job.customer if job else UNKNOWN_CUSTOMER,
         type=kind,
         flags=flags,
@@ -53,11 +59,3 @@ def to_exception(fb: FeedbackIn, job: Job | None, now: datetime | None = None) -
         created_at=now,
         updated_at=now,
     )
-
-
-def parse_driver(job_ref: str) -> str:
-    """The form's prefilled field reads "Job #4821 — Alex M.", driver after the dash."""
-    for separator in ("—", " - ", "–"):
-        if separator in job_ref:
-            return job_ref.split(separator, 1)[1].strip()
-    return "Unassigned"
